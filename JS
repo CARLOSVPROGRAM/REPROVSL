@@ -1,0 +1,53 @@
+var video = document.getElementById('hls-player');
+var thumbnail = document.getElementById('thumbnail');
+
+if (Hls.isSupported()) {
+    var hls = new Hls();
+    hls.loadSource('https://vz-0a8022e7-6c7.b-cdn.net/e7c017af-1733-4b37-8184-0617439d570d/playlist.m3u8');
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+        video.currentTime = 0;
+        video.play().then(function() {
+            console.log('Reproduciendo automáticamente');
+        }).catch(function(error) {
+            console.log('Error al reproducir automáticamente:', error);
+        });
+    });
+} else {
+    console.log('HLS no es soportado');
+}
+
+function togglePlayPause() {
+    var playButton = document.querySelector('.vslplay-wrapper.bt-unmute');
+    video.currentTime = 0;
+    video.play();
+    video.muted = false;
+    playButton.style.display = 'none';
+    video.addEventListener('timeupdate', function() {
+        var progress = (video.currentTime / video.duration) * 100;
+        document.querySelector('.fakebar').style.width = progress + '%';
+    });
+    document.querySelector('.progress-bar').style.display = 'block';
+    
+    video.addEventListener('click', function() {
+        if (!video.paused) {
+            video.pause();
+            thumbnail.style.display = 'block';
+        }
+    });
+}
+
+function resumeVideo() {
+    thumbnail.style.display = 'none';
+    video.play();
+}
+
+function actualizarNumero() {
+    const numEl = document.getElementById('num');
+    let currentValue = parseInt(numEl.innerText);
+    const randomChange = Math.floor(Math.random() * 8) - 2;
+    currentValue += randomChange;
+    numEl.innerText = currentValue;
+    setTimeout(actualizarNumero, 1500);
+}
+actualizarNumero();
